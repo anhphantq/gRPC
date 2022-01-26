@@ -3,9 +3,37 @@ syntax = "proto3";
 option go_package="./pb";
 
 import "laptop_message.proto";
+import "filter_message.proto";
 
 service LaptopService{
     rpc CreateLaptop(CreateLatopRequest) returns (CreateLatopResponse){}
+    rpc SearchLaptop(SearchLaptopRequest) returns (stream SearchLaptopResponse){}
+    rpc UploadImage(stream UploadImageRequest) returns (UploadImageResponse){}
+}
+
+message UploadImageRequest{
+    oneof data{
+        ImageInfo info = 1;
+        bytes chunk_data = 2;
+    }
+}
+
+message ImageInfo{
+    string laptop_id = 1;
+    string image_type = 2;
+}
+
+message UploadImageResponse{
+    string id = 1;
+    uint32 size = 2;
+}
+
+message SearchLaptopRequest{
+    Filter filter = 1;
+}
+
+message SearchLaptopResponse{
+    Laptop laptop = 1;
 }
 
 message CreateLatopRequest{

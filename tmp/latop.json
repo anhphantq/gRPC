@@ -1,0 +1,64 @@
+{
+ "id": "a9a50747-4200-4d95-b884-2ddc1332040e",
+ "brand": "Dell",
+ "name": "Latitude",
+ "cpu": {
+  "brand": "AMD",
+  "name": "Ryzen 5 PRO 3500U",
+  "number_cores": 2,
+  "number_threads": 8,
+  "min_ghz": 2.6308121964952047,
+  "max_ghz": 4.530161997352059
+ },
+ "ram": {
+  "value": "34",
+  "unit": "GIGABYTE"
+ },
+ "gpus": [
+  {
+   "brand": "AMD",
+   "name": "RX 580",
+   "number_cores": 0,
+   "number_threads": 0,
+   "min_ghz": 1.360201477272104,
+   "max_ghz": 1.9194729171469236,
+   "memory": {
+    "value": "4",
+    "unit": "GIGABYTE"
+   }
+  }
+ ],
+ "storages": [
+  {
+   "driver": "SSD",
+   "memory": {
+    "value": "936",
+    "unit": "GIGABYTE"
+   }
+  },
+  {
+   "driver": "HDD",
+   "memory": {
+    "value": "3",
+    "unit": "TERABYTE"
+   }
+  }
+ ],
+ "screen": {
+  "size_inch": 15.632135,
+  "resolution": {
+   "width": 4238,
+   "height": 2384
+  },
+  "pannel": "IPS",
+  "multitouch": true
+ },
+ "keyboard": {
+  "layout": "VN",
+  "backlit": true
+ },
+ "weight_kg": 2.6323412023850965,
+ "price_usd": 3165.9786930628225,
+ "release_year": 2019,
+ "updated_at": "2022-01-25T13:51:04.191440500Z"
+}

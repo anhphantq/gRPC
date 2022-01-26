@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package="./pb";
+
+import "laptop_message.proto";
+
+service LaptopService{
+    rpc CreateLaptop(CreateLatopRequest) returns (CreateLatopResponse){}
+}
+
+message CreateLatopRequest{
+    Laptop latop = 1;
+}
+
+message CreateLatopResponse{
+    string id = 1;
+}
+

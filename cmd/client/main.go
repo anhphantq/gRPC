@@ -4,12 +4,14 @@ import (
 	"bufio"
 	"context"
 	"flag"
+	"fmt"
 	"gRPC/pb"
 	"gRPC/sample"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"google.golang.org/grpc"
@@ -130,6 +132,96 @@ func testUploadImage(laptopClient pb.LaptopServiceClient){
 	UploadImage(laptopClient, laptop.GetId(), "tmp/laptop.jpg")
 }
 
+func rateLaptop(laptopClient pb.LaptopServiceClient, laptopIDs []string, scores []float64) error{
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	stream, err := laptopClient.RateLaptop(ctx)
+
+	if err != nil{
+		return fmt.Errorf("cannot rate laptop")
+	}
+
+	waitRespones := make(chan error)
+	go func () {
+		for {
+			res, err := stream.Recv()
+			if err == io.EOF{
+				log.Print("nomore response")
+				waitRespones <- nil
+				return
+			}
+
+			if err != nil{
+				waitRespones <- fmt.Errorf("cannot received with err %v", err)
+			}
+
+			log.Print("received responsse: ", res)
+		}
+	}()
+
+	for i, laptopID := range laptopIDs{
+		req := &pb.RateLaptopRequest{
+			LaptopId: laptopID,
+			Score: scores[i],
+		}
+
+		err := stream.Send(req)
+		if err != nil{
+			return fmt.Errorf("cannot send stream request %v - %v", err, stream.RecvMsg((nil)))
+		}
+
+		log.Print("sent requests: ", req)
+	}
+
+	err = stream.CloseSend()
+
+	if err != nil{
+		return fmt.Errorf("cannot send close")
+	}
+
+	err = <-waitRespones
+
+	return err
+}
+
+
+func testRateLaptop(laptopClient pb.LaptopServiceClient) {
+	n := 3
+	laptopIDs := make([]string, n)
+
+	for i := 0; i < n; i++ {
+		laptop := sample.NewLaptop()
+		laptopIDs[i] = laptop.GetId()
+		CreateLaptop(laptopClient, laptop)
+	}
+
+	scores := make([]float64, n)
+	for {
+		fmt.Print("rate laptop (y/n)? ")
+		var answer string
+		fmt.Scan(&answer)
+
+		if strings.ToLower(answer) != "y" {
+			break
+		}
+
+		for i := 0; i < n; i++ {
+			scores[i] = sample.RandomLaptopScore()
+		}
+
+		err := rateLaptop(laptopClient,laptopIDs, scores)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = rateLaptop(laptopClient,[]string{""}, []float64{3.1})
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
 func main(){
 	serverAddress := flag.String("address","", "the server address")
 	flag.Parse()
@@ -146,13 +238,14 @@ func main(){
 		CreateLaptop(laptopClient, sample.NewLaptop())
 	}
 
-	filter := &pb.Filter{
-		MaxPriceUsd: 3000,
-		MinCpuCores: 4,
-		MinCpuGhz: 2.5,
-		MinRam: &pb.Memory{Value: 0, Unit: pb.Memory_GIGABYTE},
-	}
+	// filter := &pb.Filter{
+	// 	MaxPriceUsd: 3000,
+	// 	MinCpuCores: 4,
+	// 	MinCpuGhz: 2.5,
+	// 	MinRam: &pb.Memory{Value: 0, Unit: pb.Memory_GIGABYTE},
+	// }
 
-	testSearchLaptop(laptopClient, filter)
-	testUploadImage(laptopClient)
+	// testSearchLaptop(laptopClient, filter)
+	// testUploadImage(laptopClient)
+	testRateLaptop(laptopClient)
 }

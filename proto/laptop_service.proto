@@ -9,6 +9,18 @@ service LaptopService{
     rpc CreateLaptop(CreateLatopRequest) returns (CreateLatopResponse){}
     rpc SearchLaptop(SearchLaptopRequest) returns (stream SearchLaptopResponse){}
     rpc UploadImage(stream UploadImageRequest) returns (UploadImageResponse){}
+    rpc RateLaptop(stream RateLaptopRequest) returns (stream RateLaptopRespsonse){}
+}
+
+message RateLaptopRequest{
+    string laptop_id = 1;
+    double score = 2;
+}
+
+message RateLaptopRespsonse{
+    string laptop_id = 1;
+    uint32 rated_count = 2;
+    double average_score = 3;
 }
 
 message UploadImageRequest{
